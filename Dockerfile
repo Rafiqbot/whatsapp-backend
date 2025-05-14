@@ -1,7 +1,7 @@
-# Utilise une image Node officielle
+# Utiliser une image Node officielle avec les dépendances Puppeteer
 FROM node:18-slim
 
-# Installe les dépendances nécessaires à Puppeteer
+# Installer les dépendances système requises
 RUN apt-get update && apt-get install -y \
     wget \
     ca-certificates \
@@ -20,17 +20,17 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
-    --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
 
-# Crée le dossier de l’app
+# Créer un dossier pour l'app
 WORKDIR /app
 
-# Copie les fichiers
+# Copier les fichiers de l'app
 COPY . .
 
-# Installe les dépendances npm
+# Installer les dépendances Node
 RUN npm install
 
-# Lance ton app
-CMD ["npm", "start"]
+# Lancer ton app
+CMD [ "node", "whatsapp.js" ]
