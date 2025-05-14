@@ -1,28 +1,53 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
-// Initialise le client WhatsApp avec une gestion de session locale
+// Connexion à Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Création du client WhatsApp avec options pour Railway
 const client = new Client({
-    authStrategy: new LocalAuth()
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  }
 });
 
-// Génération du QR Code dans le terminal
+// QR Code pour se connecter
 client.on('qr', (qr) => {
-    console.log('Scanne ce QR code avec ton WhatsApp :');
-    qrcode.generate(qr, { small: true });
+  qrcode.generate(qr, { small: true });
 });
 
-// Confirmation quand le client est prêt
+// Une fois connecté
 client.on('ready', () => {
-    console.log('Le client WhatsApp est connecté et prêt !');
+  console.log('✅ Bot connecté à WhatsApp !');
 });
 
-// Gestion de la réception de messages
-client.on('message', message => {
-    console.log(`Message reçu de ${message.from} : ${message.body}`);
-    // ici on pourra ajouter GPT-4 plus tard
+// Réception des messages
+client.on('message', async (message) => {
+  console.log(`📩 Nouveau message de ${message.from}: ${message.body}`);
+
+  if (message.body.toLowerCase() === 'hello') {
+    message.reply('Salut 👋, je suis ton assistant WhatsApp !');
+  }
+
+  // Exemple : sauvegarde du message dans Supabase
+  const { data, error } = await supabase
+    .from('messages')
+    .insert([
+      { sender: message.from, content: message.body }
+    ]);
+
+  if (error) {
+    console.error('Erreur en sauvegardant le message :', error);
+  } else {
+    console.log('Message sauvegardé dans Supabase :', data);
+  }
 });
 
-// Démarre le client
+// Lancer le client
 client.initialize();
+
