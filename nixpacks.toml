@@ -1,0 +1,23 @@
+[phases.setup]
+nixPkgs = [
+  "glibc",
+  "gtk3",
+  "nss",
+  "atk",
+  "cups",
+  "libxshmfence",
+  "libdrm",
+  "mesa",
+  "pango",
+  "gdk-pixbuf",
+  "libxcb",
+  "libxcomposite",
+  "libxdamage",
+  "libxrandr",
+  "libx11",
+  "libxext",
+  "libxi",
+  "libxrender",
+  "alsa-lib",
+  "dbus"
+]
